@@ -1,0 +1,6 @@
+.pio
+components/esp32-camera
+lib/esp32-camera
+output.csv
+Images_server/index.html
+build

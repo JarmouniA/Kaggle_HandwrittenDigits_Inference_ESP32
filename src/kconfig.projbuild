@@ -1,0 +1,249 @@
+menu "Camera Pins"
+    choice CAMERA_MODEL
+        bool "Select Camera Pinout"
+        default CAMERA_MODEL_AI_THINKER
+        help
+            Select Camera Pinout.
+
+    config CAMERA_MODEL_WROVER_KIT
+        bool "WROVER-KIT With OV2640 Module"
+    config CAMERA_MODEL_ESP_EYE
+        bool "ESP_EYE DevKit"
+    config CAMERA_MODEL_M5STACK_PSRAM
+        bool "M5Stack Camera With PSRAM"
+    config CAMERA_MODEL_M5STACK_WIDE
+        bool "M5Stack Camera F (Wide)"
+    config CAMERA_MODEL_AI_THINKER
+        bool "ESP32-CAM by AI-Thinker"
+    config CAMERA_MODEL_CUSTOM
+        bool "Custom Camera Pinout"
+    endchoice
+
+endmenu
+
+menu "Camera configuration"
+
+    config OV7670_SUPPORT
+        bool "Support OV7670 VGA"
+        default n
+        help
+            Enable this option if you want to use the OV7670.
+            Disable this option to save memory.
+
+    config OV7725_SUPPORT
+        bool "Support OV7725 VGA"
+        default n
+        help
+            Enable this option if you want to use the OV7725.
+            Disable this option to save memory.
+
+    config NT99141_SUPPORT
+        bool "Support NT99141 HD"
+        default n
+        help
+            Enable this option if you want to use the NT99141.
+            Disable this option to save memory.
+
+    config OV2640_SUPPORT
+        bool "Support OV2640 2MP"
+        default y
+        help
+            Enable this option if you want to use the OV2640.
+            Disable this option to save memory.
+
+    config OV3660_SUPPORT
+        bool "Support OV3660 3MP"
+        default n
+        help
+            Enable this option if you want to use the OV3360.
+            Disable this option to save memory.
+
+    config OV5640_SUPPORT
+        bool "Support OV5640 5MP"
+        default n
+        help
+            Enable this option if you want to use the OV5640.
+            Disable this option to save memory.
+
+    config GC2145_SUPPORT
+        bool "Support GC2145 2MP"
+        default n
+        help
+            Enable this option if you want to use the GC2145.
+            Disable this option to save memory.
+
+    config GC032A_SUPPORT
+        bool "Support GC032A VGA"
+        default n
+        help
+            Enable this option if you want to use the GC032A.
+            Disable this option to save memory.
+
+    config GC0308_SUPPORT
+        bool "Support GC0308 VGA"
+        default n
+        help
+            Enable this option if you want to use the GC0308.
+            Disable this option to save memory.
+
+    choice SCCB_HARDWARE_I2C_PORT
+        bool "I2C peripheral to use for SCCB"
+        default SCCB_HARDWARE_I2C_PORT1
+
+        config SCCB_HARDWARE_I2C_PORT0
+            bool "I2C0"
+        config SCCB_HARDWARE_I2C_PORT1
+            bool "I2C1"
+
+    endchoice
+
+    choice GC_SENSOR_WINDOW_MODE
+        bool "GalaxyCore Sensor Window Mode"
+        depends on (GC2145_SUPPORT || GC032A_SUPPORT || GC0308_SUPPORT)
+        default GC_SENSOR_SUBSAMPLE_MODE
+        help
+            This option determines how to reduce the output size when the resolution you set is less than the maximum resolution.
+            SUBSAMPLE_MODE has a bigger perspective and WINDOWING_MODE has a higher frame rate.
+
+        config GC_SENSOR_WINDOWING_MODE
+            bool "Windowing Mode"
+        config GC_SENSOR_SUBSAMPLE_MODE
+            bool "Subsample Mode"
+    endchoice
+
+    choice CAMERA_TASK_PINNED_TO_CORE
+        bool "Camera task pinned to core"
+        default CAMERA_CORE0
+        help
+            Pin the camera handle task to a certain core(0/1). It can also be done automatically choosing NO_AFFINITY.
+
+        config CAMERA_CORE0
+            bool "CORE0"
+        config CAMERA_CORE1
+            bool "CORE1"
+        config CAMERA_NO_AFFINITY
+            bool "NO_AFFINITY"
+
+    endchoice
+
+    config CAMERA_DMA_BUFFER_SIZE_MAX
+        int "DMA buffer size"
+        range 8192 32768
+        default 32768
+        help
+            Maximum value of DMA buffer
+            Larger values may fail to allocate due to insufficient contiguous memory blocks, and smaller value may cause DMA interrupt to be too frequent
+
+endmenu
+
+menu "LED Illuminator"
+
+    config LED_ILLUMINATOR_ENABLED
+        bool "LED Illuminator Enabled"
+        default y
+        help
+        Enable an LED Flash or IR Illuminator
+
+    config LED_LEDC_PIN
+        depends on LED_ILLUMINATOR_ENABLED
+        int "LED Illuminator GPIO Pin"
+        range 0 33
+        default 4
+        help
+        Set a pin to illuminate an onboard LED or IR Illuminator when streaming or taking snapshots.
+
+    config LED_MAX_INTENSITY
+        depends on LED_ILLUMINATOR_ENABLED
+        int "LED Maximum Intensity (0-255)"
+        range 0 255
+        default 255
+        help
+        Limit the maximum intensity of the LED while streaming to prevent overheating (0-255).
+
+    choice LED_LEDC_SPEED_MODE
+        depends on LED_ILLUMINATOR_ENABLED
+        bool "Select LEDC Timer Speed Mode"
+        default LED_LEDC_LOW_SPEED_MODE
+        help
+        Select a speed mode for the LEDC channel 
+
+    config LED_LEDC_LOW_SPEED_MODE  
+        bool "LOW_SPEED_MODE"
+    config LED_LEDC_HIGH_SPEED_MODE
+        bool "HIGH_SPEED_MODE"
+    endchoice
+
+    config LED_LEDC_TIMER
+        depends on LED_ILLUMINATOR_ENABLED
+        int "LEDC Timer"
+        range 0 3
+        default 1
+        help
+        Select the LEDC Timer (0-3)
+
+    config LED_LEDC_CHANNEL
+        depends on LED_ILLUMINATOR_ENABLED
+        int "LEDC Channel"
+        range 0 7
+        default 1
+        help
+        Select the LEDC Channel (0-7)
+endmenu
+
+menu "WiFi Settings"
+
+    config ESP_HOST_NAME
+        string "Camera Host Name"
+        default "ESP32-CAM"
+        help
+        Hostname that the camera will advertise over mDNS.
+
+    config ESP_WIFI_SSID
+        string "WiFi STA SSID"
+        default "HOME 0EDB96"
+        help
+        WiFi SSID (network name) to connect to or empty for Off.
+
+    config ESP_WIFI_PASSWORD
+        string "WiFi STA Password"
+        default "Eh5YZaEECxZv4E7j"
+        help
+        WiFi Password if WEP/WPA/WPA2 or empty if Open.
+        
+    config ESP_WIFI_AP_SSID
+        string "WiFi AP SSID"
+        default ""
+        help
+        AP SSID (network name) to create or empty for Off.
+
+    config ESP_WIFI_AP_PASSWORD
+        string "WiFi AP Password"
+        default ""
+        help
+        AP password for WPA2 or empty for Open.
+
+    config MAX_STA_CONN
+        int "Maximal STA connections"
+        default 1
+        help
+        Max number of the STA connects to AP.
+
+    config ESP_WIFI_AP_CHANNEL
+        string "WiFi AP Channel"
+        default ""
+        help
+        AP channel for better connection performance.
+
+    config SERVER_IP
+        string "WiFi AP IP Address"
+        default "192.168.4.1"
+        help
+            IP address that the ESP will assign to it's AP interface. You can use this IP to connect to the camera after flashing.
+
+    config ESP_MAXIMUM_RETRY
+        int "Maximum retry"
+        default 5
+        help
+        Set the Maximum retry to avoid station reconnecting to the AP unlimited when the AP is really inexistent.
+
+endmenu

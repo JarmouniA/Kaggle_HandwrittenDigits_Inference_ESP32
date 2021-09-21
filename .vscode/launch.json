@@ -1,0 +1,34 @@
+// AUTOMATICALLY GENERATED FILE. PLEASE DO NOT MODIFY IT MANUALLY
+//
+// PIO Unified Debugger
+//
+// Documentation: https://docs.platformio.org/page/plus/debugging.html
+// Configuration: https://docs.platformio.org/page/projectconf/section_env_debug.html
+
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "platformio-debug",
+            "request": "launch",
+            "name": "PIO Debug",
+            "executable": "C:/Users/FalconUx/Documents/PlatformIO/Projects/Digits_recognizer_TFlite_ESP32-CAM/.pio/build/esp32cam/firmware.elf",
+            "projectEnvName": "esp32cam",
+            "toolchainBinDir": "C:/Users/FalconUx/.platformio/packages/toolchain-xtensa32/bin",
+            "internalConsoleOptions": "openOnSessionStart",
+            "preLaunchTask": {
+                "type": "PlatformIO",
+                "task": "Pre-Debug"
+            }
+        },
+        {
+            "type": "platformio-debug",
+            "request": "launch",
+            "name": "PIO Debug (skip Pre-Debug)",
+            "executable": "C:/Users/FalconUx/Documents/PlatformIO/Projects/Digits_recognizer_TFlite_ESP32-CAM/.pio/build/esp32cam/firmware.elf",
+            "projectEnvName": "esp32cam",
+            "toolchainBinDir": "C:/Users/FalconUx/.platformio/packages/toolchain-xtensa32/bin",
+            "internalConsoleOptions": "openOnSessionStart"
+        }
+    ]
+}
