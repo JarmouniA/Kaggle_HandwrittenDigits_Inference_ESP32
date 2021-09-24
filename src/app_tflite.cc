@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-/*
+
 #include <cstdint>
 
 #include "esp_system.h"
@@ -32,6 +32,7 @@ limitations under the License.
 #include "image_provider.h"
 #include "model_settings.h"
 #include "model.h"
+#include "app_httpClient.h"
 
 namespace {
   // setting up logging
@@ -50,8 +51,8 @@ namespace {
   static uint8_t tensor_arena[kTensorArenaSize];
 }  // namespace
 
-  
-static bool isRunning = false;
+esp_err_t TF_init_status = ESP_FAIL;
+TaskHandle_t tf_xHandle = NULL;
 //static QueueHandle_t  predictionQueue =NULL;
 
 static const char *TAG = "App_TFLite";
@@ -83,15 +84,18 @@ esp_err_t app_tflite_init(void)
   // TensorFlow Lite for Microcontrollers.
   // Used by the interpreter to access the operations 
   // that are used by the model.
-  //
-  //static tflite::AllOpsResolver op_resolver;
+  // Uncomment the next line if you don't know which operations
+  // your tf model needs, and include "all_ops_resolver.h"
+  // static tflite::AllOpsResolver op_resolver;
   
   // Pull in only the operation implementations we need.
   // This relies on a complete list of all the ops needed by this graph.
   // An easier approach is to just use the AllOpsResolver, but this will
   // incur some penalty in code space for op implementations that are not
   // needed by this graph.
-  static tflite::MicroMutableOpResolver<6> op_resolver;
+  // If you are using AllOpsResolver above, comment the next lines.
+  #define OPERATIONS_NBR  6
+  static tflite::MicroMutableOpResolver<OPERATIONS_NBR> op_resolver;
   op_resolver.AddConv2D();
   op_resolver.AddRelu();
   op_resolver.AddMaxPool2D();
@@ -119,33 +123,26 @@ esp_err_t app_tflite_init(void)
   // 0 represents the first (and only) input tensor.
   input = interpreter->input(0);
 
-  isRunning = false;
-
   // This queue will hold the index of Max prediction
   //predictionQueue = xQueueCreate(5, sizeof(const char*));
   return ESP_OK;
 }
 
-void tf_start_inference(void) 
+void tf_start_inference(void)
 {
-  ESP_LOGI(TAG, "Starting inference");
+  ESP_LOGI(TAG, "Starting inference.");
 
-  if(isRunning)
-    goto exit;
-  else
-    isRunning = true;
-
-  // integers buffer for image capture by camera
-  temp_buffer = (uint8_t*) malloc((fb_height * fb_width) * sizeof(uint8_t));
-  if (temp_buffer == NULL) {
-        ESP_LOGE(TAG, "Temp_buffer was not allocated.");
+  if(TF_init_status != ESP_OK)
+  {
+    vTaskDelete(NULL);
   }
 
-  while(isRunning)
+  while(true)
   {
     // Get normalized image array from image_provider.
     float* tmp_buffer = (float*) malloc(kMaxImageSize * sizeof(float));
-    if (tmp_buffer == NULL) {
+    if (tmp_buffer == NULL)
+    {
         ESP_LOGE(TAG, "Tmp_buffer not allocated.");
         continue;
     }
@@ -163,11 +160,13 @@ void tf_start_inference(void)
       input->data.int8[i] = (tmp_buffer[i] / input->params.scale ) + input->params.zero_point;
     }
     free(tmp_buffer);
+    tmp_buffer = NULL;
 
     // Run the model on this input and make sure it succeeds.
     ESP_LOGI(TAG, "Invoking interpreter.");
     TfLiteStatus invoke_status = interpreter->Invoke();
-    if (invoke_status != kTfLiteOk) {
+    if (invoke_status != kTfLiteOk)
+    {
       TF_LITE_REPORT_ERROR(error_reporter, "Interpreter invoke failed.");
       continue;
     }
@@ -198,15 +197,9 @@ void tf_start_inference(void)
     
     vTaskDelay(4000 / portTICK_RATE_MS);
   }
-
-  free(temp_buffer);
-
-  exit:    
-    vTaskDelete(NULL);
 }
 
-void tf_stop_inference()
+void tf_stop_inference(void)
 {
-  isRunning = false;
+  vTaskDelete(tf_xHandle);
 }
-*/

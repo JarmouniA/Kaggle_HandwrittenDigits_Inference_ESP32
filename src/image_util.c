@@ -21,7 +21,7 @@
   * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   *
   */
-/*
+
 #include "image_util.h"
 
 void image_zoom_in_twice(uint8_t *dimage,
@@ -516,4 +516,3 @@ Matrix *get_perspective_transform(float *srcx, float *srcy, float *dstx, float *
     m->array[2][2] = 1;
     return m;
 }
-*/

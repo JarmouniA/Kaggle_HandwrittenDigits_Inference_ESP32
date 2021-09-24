@@ -18,10 +18,6 @@ limitations under the License.
 
 #include "esp_log.h"
 
-extern uint8_t* temp_buffer;
-extern uint fb_width;
-extern uint fb_height;
-
 #ifdef __cplusplus
 extern "C"
 {

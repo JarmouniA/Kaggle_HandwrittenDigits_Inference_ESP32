@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-/*
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,10 +23,9 @@ limitations under the License.
 
 #include "model_settings.h"
 #include "image_util.h"
+#include "app_httpClient.h"
 
 static const char *TAG = "Image_Provider";
-
-uint8_t* temp_buffer;
 
 static float get_normalised_value(uint8_t intval);
 
@@ -39,25 +38,19 @@ static void normalise_image_buffer(float* dest_image_buffer, uint8_t* imageBuffe
 }
 
 esp_err_t GetImage(uint8_t image_width, uint8_t image_height, uint8_t channels, float* image_data)
-{
-  //memcpy(temp_buffer, frame_buffer->buf, frame_buffer->len);
-
-  //memcpy(temp_buffer, test_arrays[iteration], kMaxImageSize);
-  
+{ 
   uint8_t* array_buffer = (uint8_t*) malloc(kMaxImageSize * sizeof(uint8_t));
 
-  if (array_buffer == NULL) {
-        ESP_LOGE(TAG, "Array_buffer was not allocated.");
-        return ESP_FAIL;
+  if (array_buffer == NULL) 
+  {
+	ESP_LOGE(TAG, "Array_buffer was not allocated.");
+	return ESP_FAIL;
   }
-  // We need to resize our 96x96 grayscale image to 28x28 pixels as we have trained the model using the later
-  image_resize_linear(array_buffer, temp_buffer, image_height, image_width, channels, fb_width, fb_height);
-
-  //free(temp_buffer);
 
   normalise_image_buffer(image_data, array_buffer, kMaxImageSize);
   
   free(array_buffer);
+  array_buffer = NULL;
   
   return ESP_OK;
 }
@@ -105,4 +98,3 @@ static float get_normalised_value(uint8_t intval)
 	float norm_val = lookup[intval];
 	return norm_val ;
 }
-*/

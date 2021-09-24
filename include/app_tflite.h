@@ -18,13 +18,16 @@ limitations under the License.
 
 #include "esp_log.h"
 
+extern esp_err_t TF_init_status;
+extern TaskHandle_t tf_xHandle;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 esp_err_t app_tflite_init(void);
 void tf_start_inference(void);
-void tf_stop_inference();
+void tf_stop_inference(void);
 
 #ifdef __cplusplus
 }

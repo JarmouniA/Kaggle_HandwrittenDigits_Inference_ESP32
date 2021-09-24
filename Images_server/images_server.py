@@ -43,7 +43,7 @@ ResponseData = namedtuple("ResponseData",
 
 CHUNK_SIZE = 1024
 PROTOCOL = "http"
-ROUTE_INDEX = "/index.html"
+ROUTE_INDEX = "/"
 ROUTE_IMAGE = "/image"
 ROUTE_RESULT = "/result"
 ROUTE_EXPORT = "/export"
@@ -119,16 +119,19 @@ class ChunkedHTTPRequestHandler(BaseHTTPRequestHandler):
         """Handles routing for the application's entry point'"""
 
         try:
+            response_body = str("Connected to server.")
+            bytes_data = bytes(response_body, "utf-8") if sys.version_info >= (3, 0) \
+                else bytes(response_body)
             return ResponseData(status = HTTP_STATUS["OK"], content_type = "text_html",
                                 # Open a binary stream for reading the index
                                 # HTML file
-                                data_stream = open(os.path.join(sys.path[0],
-                                                              path[1:]), "rb"))
+                                data_stream = BytesIO(bytes_data)
                                 # if Python version is >= 3.6, this stream must be
                                 # buffered (activated by default in binary mode of 
                                 # Open() )
+                                )
 
-        except IOError as err:
+        except SystemError as err:
             # Couldn't open the stream
             raise HTTPStatusError(HTTP_STATUS["INTERNAL_SERVER_ERROR"],
                                   str(err))
@@ -145,15 +148,18 @@ class ChunkedHTTPRequestHandler(BaseHTTPRequestHandler):
 
         # Validate the parameters, set error flag in case of unexpected
         # values
-        if (len(str(ImageID)) == 0) or (int(ImageID) > 27999) or (int(ImageID) < 0) or (outputFormat not in IMAGE_FORMATS):
+        if (len(str(ImageID)) == 0) or (int(ImageID) > 27999) or (int(ImageID) < 0)\
+             or (outputFormat not in IMAGE_FORMATS):
             raise HTTPStatusError(HTTP_STATUS["BAD_REQUEST"],
                                   "Wrong parameters")
         else:
             try:
-                print(u"[START]: Received GET for image_ID: %d with format: %s " % (int(ImageID), outputFormat ) )
+                print(u"[route_image]: Received GET for image_ID= %d & format= %s " \
+                    % (int(ImageID), outputFormat ) )
                 
                 # Load an image
-                img_array = np.array(np.reshape(test_img_arr[int(ImageID)], (28, 28)), dtype = np.uint8)
+                img_array = np.array(np.reshape(test_img_arr[int(ImageID)], (28, 28)), 
+                                    dtype = np.uint8)
                 
                 PIL_img = Image.fromarray(img_array, mode = "L")
 
@@ -161,16 +167,17 @@ class ChunkedHTTPRequestHandler(BaseHTTPRequestHandler):
                 PIL_img.save(ImageStream, format = outputFormat)
                 ImageStream.seek(0)
 
-            except IOError as err:
+            except SystemError as err:
                 # The service returned an error
                 raise HTTPStatusError(HTTP_STATUS["INTERNAL_SERVER_ERROR"],
                                       str(err))
-
-            return ResponseData(status = HTTP_STATUS["OK"],
-                                content_type = IMAGE_FORMATS[outputFormat],
-                                # Access the image buffered stream
-                                data_stream = ImageStream)
-    
+            else:
+                return ResponseData(status = HTTP_STATUS["OK"],
+                                    content_type = IMAGE_FORMATS[outputFormat],
+                                    # Access the image buffered stream
+                                    data_stream = ImageStream
+                                    )
+        
     def send_headers(self, status, content_type):
         """Send out the group of headers for a successful request"""
 
@@ -229,7 +236,7 @@ class ChunkedHTTPRequestHandler(BaseHTTPRequestHandler):
             elif path == ROUTE_RESULT:
                 status = self.route_result()
             elif path == ROUTE_EXPORT:
-                status == self.route_export()
+                status = self.route_export()
             else:
                 raise HTTPStatusError(HTTP_STATUS["NOT_FOUND"], "Resource not found")
 
@@ -260,18 +267,22 @@ class ChunkedHTTPRequestHandler(BaseHTTPRequestHandler):
                 f.write(self.rfile.read(length))
                 f.seek(0)
                 Json = load(f)
+                print(u"[route_result]: Received POST with image_ID= %d & result= %d " \
+                    % ( int(Json["ImageID"]), int(Json["result"]) ) )
                 predictions[int(Json["ImageID"])] = int(Json["result"])
 
         except SystemError as err:
             # The service returned an error
             raise HTTPStatusError(HTTP_STATUS["INTERNAL_SERVER_ERROR"],
                                     str(err))
-
-        return HTTP_STATUS["No_Content"]
+        else:
+            return HTTP_STATUS["No_Content"]
     
     def route_export(self):
         """Handles routing for saving all the inference results in a csv file"""
+        
         global predictions
+        
         try:
             df_pred = pd.DataFrame({'ImageId' : np.arange(1, 28001, 1),
                             'Label' : predictions})
@@ -281,8 +292,8 @@ class ChunkedHTTPRequestHandler(BaseHTTPRequestHandler):
             # The service returned an error
             raise HTTPStatusError(HTTP_STATUS["INTERNAL_SERVER_ERROR"],
                                     str(err))
-
-        return HTTP_STATUS["OK"]
+        else:
+            return HTTP_STATUS["No_Content"]
 
 
 def load_images():
@@ -293,7 +304,6 @@ def load_images():
 
     except pd.errors.EmptyDataError as err:
         print("Cannot open/read csv test file")
-
 
 def submit_results():
     # use kaggle API
