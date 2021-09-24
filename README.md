@@ -12,5 +12,6 @@ After making sure that the model is working, we need to compress it so that it c
 - [Quantization-aware training](https://www.tensorflow.org/model_optimization/guide/quantization/training) : Generate the TFLite model from a quantization-aware model that was trained with the quantization step in mind.
 
 Now that we have our TFLite model, we can generate a C file containing the model's weights and characteristics, which will be used by TensorFlow Lite for Microcontrollers, using the [Xxd tool](https://www.tutorialspoint.com/unix_commands/xxd.htm) as described in the last step in the notebook.
+
 -----------------------------
 Our TFLite micro is now ready to be deployed on [the edge](https://towardsdatascience.com/why-machine-learning-on-the-edge-92fac32105e6), we just need the TensorFlow Lite For Microcontrollers' library compiled for ESP32.
