@@ -1,6 +1,6 @@
 .pio
 .vscode
+sdkconfig.esp32cam
+sdkconfig
 output.csv
-build
-.vscode
 test.csv
