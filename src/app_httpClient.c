@@ -114,8 +114,8 @@ esp_err_t _http_event_handle(esp_http_client_event_t *event)
                 // Response is accumulated in output_buffer.
                 // Uncomment the below line to print the accumulated response.
                 ESP_LOG_BUFFER_HEX(TAG, output_buffer, output_len);
-                //char **content_type;
-                //ESP_ERROR_CHECK(esp_http_client_get_header(event->client, "Content-type", content_type));
+                //char *content_type = NULL;
+                //ESP_ERROR_CHECK(esp_http_client_get_header(event->client, "Content-type", &content_type));
                 //if (strcmp(*content_type, "text_html"))
                 //{
                 decode_text_data(output_buffer);
