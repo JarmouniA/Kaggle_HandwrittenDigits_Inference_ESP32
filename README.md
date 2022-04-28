@@ -18,4 +18,4 @@ Our TFLite Micro model is now ready to be deployed on [the edge](https://towards
 
 The resulting TFLM library will be used with the Visual Studio Code extension [PlatformIO](https://platformio.org/) which really facilities the building process for ESP32 applications. Here is an official PlatformIO guide that explains the different configuration options for ESP32 projects. Also, this project is build with the official [Espressif IoT Development Framework](https://docs.platformio.org/en/latest/frameworks/espidf.html#framework-espidf) (ESP-IDF) not the ESP32 Arduino Framework. The library must be placed in both the /components & /lib directories.
 
-The (platformio.ini)(platformio.ini) file already contains the necessary configuration options to build & deploy this project on the ESP32-CAM, and it will be detected automatically once the project in opened in VSCode with the PlatformIO extension installed.
+The [platformio.ini](platformio.ini) file already contains the necessary configuration options to build & deploy this project on the ESP32-CAM, and it will be detected automatically once the project in opened in VSCode with the PlatformIO extension installed.
