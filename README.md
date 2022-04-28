@@ -14,4 +14,6 @@ After making sure that the model is working, we need to compress it so that it c
 Now that we have our TFLite model, we can generate a C file containing the model's weights and characteristics, which will be used by TensorFlow Lite for Microcontrollers, using the [Xxd tool](https://www.tutorialspoint.com/unix_commands/xxd.htm) as described in the last step in the notebook.
 
 -----------------------------
-Our TFLite micro is now ready to be deployed on [the edge](https://towardsdatascience.com/why-machine-learning-on-the-edge-92fac32105e6), we just need the TensorFlow Lite For Microcontrollers' library compiled for ESP32.
+Our TFLite Micro model is now ready to be deployed on [the edge](https://towardsdatascience.com/why-machine-learning-on-the-edge-92fac32105e6), we just need the [TensorFlow Lite For Microcontrollers](https://github.com/tensorflow/tflite-micro)' library compiled for ESP32. To get the library, the best option is to use the Docker image provided by the following [Github repository](https://github.com/atomic14/platformio-tensorflow-lite) (Thank you [@atomic14](https://github.com/atomic14)) to compile the library with the TensorFlow & [ESP-IDF](https://github.com/espressif/esp-idf) versions of your choice (I recommend using the latest stable versions).
+
+The resulting TFLM library will be used with the Visual Studio Code Extension [PlatformIO](https://platformio.org/) which really facilities the building process for ESP32 applications.
